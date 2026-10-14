@@ -57,7 +57,15 @@ public class LinkedList <I extends Comparable<? super I>> implements ListInterfa
 			this.tail = node;
 			this.size++;
 		}else {
+			/*
+			 * Link the new node to the existing
+			 * linked list.
+			 */
 			this.tail.setNext(node);
+			
+			/* Once we have linked the new node to the existing
+			 * linked list, we update the tail.
+			 */
 			this.tail = node;
 			this.size++;
 		}
@@ -67,8 +75,76 @@ public class LinkedList <I extends Comparable<? super I>> implements ListInterfa
 
 	@Override
 	public void add(I element, int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
 		
+		
+		/*
+		 * As  we already know linkedlist have no specific
+		 * indexes as arrays do. So Linkedlist do not have
+		 * random access. In order for us to insert (add)\
+		 * an element at a given index, we have to first 
+		 * loop (iterate) to the node where we want to insert
+		 * and once we find the node we can be able to insert
+		 * 
+		 */
+		
+		if(index < 0 || index > this.size) {
+			throw new IndexOutOfBoundsException("Invalid index = " + index);
+		}
+		
+		
+		if(index == this.size) {
+			// This means we want to add at the tail
+			this.add(element);
+		}else {
+			//The head
+			Node<I> node = new Node<I>(element);
+			if (index == 0) {
+				/*
+				 * We are linking the new node to the 
+				 * existing linkedlist by pointing to the
+				 * current head
+				 */
+				node.setNext(this.head);
+				//Update head
+				// The new node becomes the new head of the linkedlist
+				this.head = node;
+				this.size++;
+				
+			}else {
+				/* we want to use this to insert at a node
+				 * that is not the head or the tail.
+				 * 
+				 * Since nodes are not contiguous, they 
+				 * scattered through the memory, we have to
+				 * iterate to the node where we have to insert
+				 * so that we can be able to link the new node.
+				 */
+				
+				Node <I> previousNode = null;
+				
+				Node <I> currentNode = this.head;
+				int currentNodeIndex = 0;
+				
+				
+				while(currentNodeIndex < (index - 1)) {
+					//previousNode = currentNode; 
+					currentNode = currentNode.getNext();
+					currentNodeIndex++;
+				}
+				
+				
+				//Node<I> nextOfNewNode = currentNode.getNext();
+				node.setNext(currentNode.getNext());
+				currentNode.setNext(node);
+				
+				//previousNode.setNext(node);
+				//node.setNext(currentNode);
+				
+				
+				this.size++;
+			}
+			
+		}
 	}
 
 	@Override
@@ -156,8 +232,65 @@ public class LinkedList <I extends Comparable<? super I>> implements ListInterfa
 
 	@Override
 	public I remove(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		
+		if(index < 0 || index >= this.size) {
+			throw new IndexOutOfBoundsException("You provided an invalid index " + index);
+		}
+		
+		I removedElement = null;
+		
+		
+		
+		/*
+		 * 		if(this.size == 1 && index == 0) {
+			removedElement = this.head.getData();
+			removeAll();
+		}else if (index == 0) {
+			removedElement = this.head.getData();
+			this.head = this.head.getNext();
+			this.size--;
+		
+		 */
+		if(index == 0) {
+			if(this.size == 1) {
+				removedElement = this.head.getData();
+				removeAll();
+			}else {
+				removedElement = this.head.getData();
+				this.head = this.head.getNext();
+				this.size--;
+			}
+		}else {
+			
+			
+			int currentNodeCounter = 0;
+			Node<I> currentNode = this.head;
+			Node<I> previousNode = null;
+			
+			while(currentNodeCounter < index) {
+				//Make the currentNode to be the previous of the future next node
+				previousNode = currentNode;
+				currentNode = currentNode.getNext();
+				currentNodeCounter++;
+			}
+			
+			removedElement = currentNode.getData();
+			if(index == this.size - 1) {
+				// remove the tail
+				this.tail = previousNode;
+				previousNode.setNext(null);
+				this.size--;
+			}else {
+				previousNode.setNext(currentNode.getNext());
+				currentNode.setNext(null);
+				this.size--;
+			}
+			
+		}
+		
+		
+		return removedElement;
 	}
 
 	@Override
